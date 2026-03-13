@@ -1,0 +1,18 @@
+# Environments
+venv/
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Databases
+*.db
+*.sqlite3
+
+# Logs
+*.log
+*.txt
+
+# IDEs
+.vscode/
+.idea/
