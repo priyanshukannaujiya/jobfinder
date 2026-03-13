@@ -1,6 +1,6 @@
 import os
 import logging
-from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, UniqueConstraint
+from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, UniqueConstraint, Boolean
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.dialects.postgresql import insert
 import datetime
@@ -28,8 +28,11 @@ class JobJob(Base):
     experience_level = Column(String(100))
     description = Column(Text)
     job_type = Column(String(100))
+    is_fresher = Column(Boolean, default=False)
     tech_stack = Column(Text)
     recommended_project = Column(Text)
+    recruiter_name = Column(String(255))
+    recruiter_link = Column(String(1000))
     link = Column(String(1000), nullable=False, unique=True)
     posting_date = Column(DateTime)
     source = Column(String(100))

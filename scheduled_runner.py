@@ -11,8 +11,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger("ScheduledRunner")
 
-# How often to run the pipeline, in hours (Default: 6 hours)
-RUN_INTERVAL_HOURS = int(os.getenv("RUN_INTERVAL_HOURS", 6))
+# How often to run the pipeline, in hours (Default: 12 hours)
+RUN_INTERVAL_HOURS = int(os.getenv("RUN_INTERVAL_HOURS", 12))
 RUN_INTERVAL_SECONDS = RUN_INTERVAL_HOURS * 3600
 
 def run_pipeline():

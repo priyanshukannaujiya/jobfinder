@@ -14,8 +14,11 @@ class JobJob(Base):
     experience_level = Column(String(100))
     description = Column(Text)
     job_type = Column(String(100))
+    is_fresher = Column(Boolean, default=False)
     tech_stack = Column(Text)
     recommended_project = Column(Text)
+    recruiter_name = Column(String(255))
+    recruiter_link = Column(String(1000))
     link = Column(String(1000), nullable=False, unique=True)
     posting_date = Column(DateTime)
     source = Column(String(100))
@@ -43,5 +46,7 @@ class AlertPreference(Base):
     keywords = Column(String(500)) # comma separated keywords
     email_alerts = Column(Boolean, default=True)
     target_locations = Column(String(500)) # comma separated
+    last_alert_sent = Column(DateTime)
+    last_seen_job_id = Column(Integer, default=0)
     
     user = relationship("User", back_populates="preferences")

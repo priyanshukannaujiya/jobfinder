@@ -12,8 +12,11 @@ class JobResponse(BaseModel):
     experience_level: Optional[str] = None
     description: Optional[str] = None
     job_type: Optional[str] = None
+    is_fresher: bool = False
     tech_stack: Optional[str] = None
     recommended_project: Optional[str] = None
+    recruiter_name: Optional[str] = None
+    recruiter_link: Optional[str] = None
     link: str
     posting_date: Optional[datetime] = None
     source: Optional[str] = None

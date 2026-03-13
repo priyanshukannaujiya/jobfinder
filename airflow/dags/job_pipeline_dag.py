@@ -11,12 +11,12 @@ default_args = {
     'retry_delay': timedelta(minutes=5),
 }
 
-# Run every 6 hours
+# Run every 12 hours
 dag = DAG(
     'job_scraping_and_alerting',
     default_args=default_args,
-    description='A DAG to scrape jobs and send email alerts every 6 hours',
-    schedule_interval='0 */6 * * *',
+    description='A DAG to scrape jobs and send email alerts every 12 hours',
+    schedule_interval='0 */12 * * *',
     start_date=datetime(2023, 1, 1),
     catchup=False,
     tags=['etl'],

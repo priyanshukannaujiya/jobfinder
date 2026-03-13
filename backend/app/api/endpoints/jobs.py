@@ -11,13 +11,16 @@ router = APIRouter()
 def get_jobs(
     db: Session = Depends(get_db),
     skip: int = Query(0, ge=0),
-    limit: int = Query(50, le=100),
+    limit: int = Query(50, le=2000),
     role: Optional[str] = None,
     keyword: Optional[str] = None,
-    location: Optional[str] = None
+    location: Optional[str] = None,
+    fresher_only: bool = Query(False)
 ):
     query = db.query(JobJob)
     
+    if fresher_only:
+        query = query.filter(JobJob.is_fresher == True)
     if role:
         query = query.filter(JobJob.job_title.ilike(f"%{role}%"))
     if keyword:

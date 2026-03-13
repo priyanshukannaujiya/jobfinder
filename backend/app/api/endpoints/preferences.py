@@ -1,14 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.db.models import User, AlertPreference
 from app.schemas.schemas import PreferenceCreate, PreferenceResponse, UserResponse
+from app.services.alert_manager import process_alerts
 from typing import List
 
 router = APIRouter()
 
 @router.post("/", response_model=PreferenceResponse)
-def manage_preferences(pref_in: PreferenceCreate, db: Session = Depends(get_db)):
+def manage_preferences(pref_in: PreferenceCreate, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     # First, find or create user based on email
     user = db.query(User).filter(User.email == pref_in.email).first()
     if not user:
@@ -34,6 +35,11 @@ def manage_preferences(pref_in: PreferenceCreate, db: Session = Depends(get_db))
         
     db.commit()
     db.refresh(pref)
+    
+    # Trigger an immediate background task to find matches and email ONLY this user now
+    if pref.email_alerts:
+        background_tasks.add_task(process_alerts, user_id=user.id, force_send=True)
+        
     return pref
 
 @router.get("/{email}", response_model=UserResponse)

@@ -59,6 +59,7 @@ def clean_jobs_data(jobs_data: list) -> pd.DataFrame:
     tech_stacks = []
     job_types = []
     recommended_projects = []
+    is_freshers = []
     
     for idx, row in df.iterrows():
         title = row.get('job_title', '')
@@ -66,12 +67,13 @@ def clean_jobs_data(jobs_data: list) -> pd.DataFrame:
         desc = row.get('description', '')
         skills = row.get('skills', '')
         
-        # We pass an empty list for user_keywords because we just want general stats 
-        # (not matching against a specific user during general DB ingestion)
         analysis = analyze_job(title, company, desc, skills, [])
         
-        # job_type
-        if analysis['is_fresher']:
+        # Determine job_type and fresher status
+        is_fresher_bool = analysis['is_fresher']
+        is_freshers.append(is_fresher_bool)
+        
+        if is_fresher_bool:
             job_types.append('Internship' if 'intern' in str(title).lower() else 'Entry Level')
         else:
             job_types.append('Full-Time' if 'contract' not in str(title).lower() else 'Contract')
@@ -82,6 +84,13 @@ def clean_jobs_data(jobs_data: list) -> pd.DataFrame:
     df['job_type'] = job_types
     df['tech_stack'] = tech_stacks
     df['recommended_project'] = recommended_projects
+    df['is_fresher'] = is_freshers
+
+    # 7. Ensure recruiter info exists (even if null)
+    if 'recruiter_name' not in df.columns:
+        df['recruiter_name'] = None
+    if 'recruiter_link' not in df.columns:
+        df['recruiter_link'] = None
 
     # Return cleaned records as a list of dictionaries for the DB ingestion
     return df

@@ -18,24 +18,48 @@ with tab1:
     st.header("Latest Job Listings")
     
     # Filters
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     with col1:
         search_keyword = st.text_input("Search Keyword / Title", "")
     with col2:
         search_location = st.text_input("Location", "")
+    with col3:
+        fresher_only = st.checkbox("🌱 Freshers/Interns Only", value=False)
         
     if st.button("Refresh Feed"):
         params = {}
         if search_keyword: params['keyword'] = search_keyword
         if search_location: params['location'] = search_location
+        if fresher_only: params['fresher_only'] = True
         
         try:
             response = requests.get(f"{API_BASE_URL}/jobs", params=params)
             if response.status_code == 200:
                 jobs = response.json()
                 if jobs:
-                    df = pd.DataFrame(jobs)
-                    st.dataframe(df[['job_title', 'company', 'location', 'skills', 'source', 'posting_date', 'link']])
+                    for job in jobs:
+                        with st.container():
+                            st.subheader(f"{job['job_title']} @ {job['company']}")
+                            colA, colB, colC = st.columns(3)
+                            colA.write(f"📍 {job['location']}")
+                            colB.write(f"💼 {'🌱 Fresher' if job['is_fresher'] else '🎯 Professional'}")
+                            colC.write(f"🔗 [Apply Here]({job['link']})")
+                            
+                            if job.get('recruiter_name'):
+                                st.markdown(f"👤 **Recruiter:** [{job['recruiter_name']}]({job.get('recruiter_link', '#')})")
+                            
+                            if job.get('tech_stack'):
+                                st.markdown(f"⚙️ **Tech Stack:** `{job['tech_stack']}`")
+                            
+                            st.write(f"🛠️ **Source Keywords:** {job['skills']}")
+                            
+                            if job.get('recommended_project'):
+                                with st.expander("🚀 Industry-Standard Projects to land this job"):
+                                    st.info(f"**Primary Suggestion:** {job['recommended_project']}")
+                                    st.write("---")
+                                    st.caption("Building these shows you have the exact skills this company needs.")
+                            
+                            st.divider()
                 else:
                     st.info("No jobs found matching your criteria.")
             else:
@@ -131,7 +155,6 @@ with tab4:
                         st.bar_chart(location_counts)
                         
                     st.subheader("Internship vs Full-Time Ratio")
-                    # Naively determine internship by title or description
                     def get_job_type(title):
                         title_lower = str(title).lower()
                         if 'intern' in title_lower or 'trainee' in title_lower:
@@ -140,6 +163,12 @@ with tab4:
                     df['job_type'] = df['job_title'].apply(get_job_type)
                     type_counts = df['job_type'].value_counts()
                     st.bar_chart(type_counts)
+
+                    if 'recruiter_name' in df.columns:
+                        recruiter_counts = df['recruiter_name'].dropna().value_counts().head(10)
+                        if not recruiter_counts.empty:
+                            st.subheader("Top Hiring Recruiters")
+                            st.bar_chart(recruiter_counts)
                     
                     st.subheader("Top Skills / Tech Stacks")
                     # Simple split of skills list if it's a comma separated string
