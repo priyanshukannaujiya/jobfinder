@@ -3,7 +3,9 @@ import requests
 import pandas as pd
 from utils.pdf_parser import extract_text_from_pdf, extract_skills, calculate_match_score
 
-API_BASE_URL = "http://localhost:8000"
+import os
+
+API_BASE_URL = os.getenv("API_URL", "http://localhost:8000")
 
 st.set_page_config(page_title="JobMaker Dashboard", page_icon="📈", layout="wide")
 
